@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pump Monitor</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; }
+    th, td { padding: 8px 10px; border-bottom: 1px solid #eee; text-align: left; }
+    th { background: #fafafa; position: sticky; top: 0; }
+    .pill { padding: 2px 8px; border-radius: 999px; font-size: 12px; }
+    .risk-low { background: #e6ffed; }
+    .risk-med { background: #fff7e6; }
+    .risk-high { background: #ffe6e6; }
+    .btn { padding: 6px 10px; border: 1px solid #333; border-radius: 8px; background: #fff; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Pump Monitor — Listings</h1>
+  <table id="t">
+    <thead>
+      <tr>
+        <th>Time</th><th>Symbol</th><th>Contract</th><th>LP USD</th><th>Score</th><th>Flags</th><th>Actions</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function load() {
+      const res = await fetch('/api/listings');
+      const rows = await res.json();
+      const tb = document.querySelector('#t tbody');
+      tb.innerHTML = '';
+      for (const r of rows) {
+        const tr = document.createElement('tr');
+        const riskClass = r.score < 40 ? 'risk-low' : (r.score < 70 ? 'risk-med' : 'risk-high');
+        tr.innerHTML = `
+          <td>${new Date(r.timestamp || Date.now()).toLocaleTimeString()}</td>
+          <td>${r.symbol || ''}</td>
+          <td><code>${r.contract || ''}</code></td>
+          <td>${r.lp_usd ?? ''}</td>
+          <td><span class="pill ${riskClass}">${r.score}</span></td>
+          <td>${(r.flags || []).join(', ')}</td>
+          <td>
+            <button class="btn" data-contract="${r.contract}" data-chain="${r.chain || 'ethereum'}" onclick="prepare(this)">Prepare Tx</button>
+          </td>
+        `;
+        tb.appendChild(tr);
+      }
+    }
+    async function prepare(btn) {
+      const chain = btn.getAttribute('data-chain');
+      const contract = btn.getAttribute('data-contract');
+      const res = await fetch('/api/prepare', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chain, contract })
+      });
+      const out = await res.json();
+      if (out.chain === 'evm') {
+        alert('Unsigned EVM tx ready. Check JSON in console.');
+        console.log(out);
+      } else if (out.chain === 'solana') {
+        if (out.phantomDeeplink) {
+          window.open(out.phantomDeeplink, '_blank');
+        } else if (out.jupiterUrl) {
+          window.open(out.jupiterUrl, '_blank');
+        } else {
+          alert('No deeplink available.');
+        }
+      } else {
+        alert('Unknown chain result');
+      }
+    }
+    setInterval(load, 5000);
+    load();
+  </script>
+</body>
+</html>

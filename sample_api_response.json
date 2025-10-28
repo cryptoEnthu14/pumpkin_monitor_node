@@ -1,0 +1,20 @@
+[
+  {
+    "name": "WhatIF",
+    "symbol": "WHATIF",
+    "contract": "0xABCDEFabcdefABCDEFabcdefABCDEFabcdef1234",
+    "lp_usd": 1200,
+    "chain": "ethereum",
+    "timestamp": 1698000000
+  },
+  {
+    "name": "ToyCoin",
+    "symbol": "TOY",
+    "contract": "0xDEADBEEFDEADbeefDEADbeefDEADbeefDEADbeef",
+    "lp_usd": 50,
+    "chain": "ethereum",
+    "timestamp": 1698000100,
+    "top10_percent": 82,
+    "verified": false
+  }
+]
