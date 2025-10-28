@@ -1,0 +1,20 @@
+{
+  "name": "pumpfun-monitor-node",
+  "version": "0.2.0",
+  "description": "Read-only pump.fun / new listing monitor (Node.js) \u2014 alerts + risk scoring + web dashboard",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.8",
+    "dotenv": "^16.4.5",
+    "ethers": "^6.13.1",
+    "express": "^4.19.2",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
